@@ -1,18 +1,19 @@
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
-import { deleteContact } from 'contactsStorage/contactsSlice';
+import { useDeleteContactMutation } from 'contactsStorage/contactsAPI';
 
 import styles from './ContactsListItem.module.css';
 
 export const ContactsListItem = ({ id, name, number }) => {
-  const dispatch = useDispatch();
-
-  const deleteContacts = id => dispatch(deleteContact(id));
+  const [deleteContact, { isLoading }] = useDeleteContactMutation();
 
   return (
     <li id={id} className={styles.item}>
-      {name}: {number}
-      <button className={styles.button} onClick={() => deleteContacts(id)}>
+      <span className={styles.name}>{name}</span>: {number}
+      <button
+        className={styles.button}
+        onClick={() => deleteContact(id)}
+        disabled={isLoading}
+      >
         Delete
       </button>
     </li>

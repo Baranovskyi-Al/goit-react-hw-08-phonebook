@@ -13,7 +13,7 @@ export const ContactsFilter = () => {
 
   return (
     <div className={styles.section}>
-      <h2>Find contacts by name</h2>
+      <h2 className={styles.title}>Find contacts by name</h2>
       <input
         className={styles.input}
         onChange={onChange}
