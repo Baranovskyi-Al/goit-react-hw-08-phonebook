@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import {
   useGetContactsQuery,
@@ -9,12 +9,12 @@ import Notiflix from 'notiflix';
 import styles from './ContactForm.module.css';
 
 export const ContactForm = () => {
-  const [form, setForm] = useState({ name: '', phone: '' });
+  const [form, setForm] = useState({ name: '', number: '' });
   const { data: contacts } = useGetContactsQuery();
-  const [addContact, { isLoading }] = useAddContactMutation();
+  const [addContact, { isSuccess, isLoading }] = useAddContactMutation();
 
-  const handleChange = e => {
-    const { name, value } = e.currentTarget;
+  const handleChange = element => {
+    const { name, value } = element.currentTarget;
     setForm(prevForm => ({ ...prevForm, [name]: value }));
   };
 
@@ -30,18 +30,22 @@ export const ContactForm = () => {
       return Notiflix.Notify.failure(`${data.name} is already in phonebook`);
     }
     addContact(data);
-
-    inputClean();
   };
 
   const inputClean = () => {
-    setForm({ name: '', phone: '' });
+    setForm({ name: '', number: '' });
   };
 
-  const { name, phone } = form;
+  useEffect(() => {
+    if (isSuccess) {
+      inputClean();
+    }
+  }, [isSuccess]);
 
+  const { name, number } = form;
   return (
     <div className={styles.section}>
+      <h2 className={styles.title}>Add contacts to phone book</h2>
       <form onSubmit={handleSubmit}>
         <label className={styles.label}>
           Name
@@ -56,21 +60,19 @@ export const ContactForm = () => {
             onChange={handleChange}
           />
         </label>
-
         <label className={styles.label}>
           Number
           <input
             className={styles.input}
             type="tel"
-            name="phone"
+            name="number"
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
             title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
             required
-            value={phone}
+            value={number}
             onChange={handleChange}
           />
         </label>
-
         <button type="submit" className={styles.button} disabled={isLoading}>
           Add contact
         </button>
